@@ -1,0 +1,10 @@
+---
+- name: apt install php7 dependencies
+  become: yes
+  apt:
+    state: present
+    name: "{{ php_config[ansible_os_family].dependencies }}"
+  register: result
+  retries: 3
+  delay: 10
+  until: not result.failed

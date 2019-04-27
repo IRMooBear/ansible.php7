@@ -1,0 +1,62 @@
+---
+- import_tasks: RedHat.yml
+  when: ansible_os_family == 'RedHat'
+- import_tasks: Debian.yml
+  when: ansible_os_family == 'Debian'
+- name: download php
+  become: yes
+  get_url:
+    url: http://ca1.php.net/get/php-{{php_version}}.tar.gz/from/this/mirror
+    dest: /usr/local/src/php-{{php_version}}.tar.gz
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    checksum: "{{ php_checksum }}"
+- name: extracting php files
+  become: yes
+  unarchive:
+    remote_src: yes
+    src: /usr/local/src/php-{{ php_version }}.tar.gz
+    dest: /usr/local/src/
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+- name: check previous php exists
+  stat:
+    path: /usr/local/src/php-{{ php_version }}/Makefile
+  register: php_makefile_exists
+- name: make clean
+  become: no
+  make:
+    target: clean
+  args:
+    chdir: /usr/local/src/php-{{ php_version }}
+  when: php_makefile_exists.stat.exists
+- name: configure php
+  become: no
+  command: ./configure {{ php_source_configure_command }}
+  args:
+    chdir: /usr/local/src/php-{{ php_version }}
+  async: 1800
+  poll: 5
+- name: make php
+  become: no
+  make:
+    params:
+      MAKEFLAGS: -j{{ compile_threads }}
+      NUM_THREADS: "{{ compile_threads }}"
+  args:
+    chdir: /usr/local/src/php-{{ php_version }}
+  async: 3600
+  poll: 5
+- name: make install php
+  become: yes
+  make:
+    target: install
+  args:
+    chdir: /usr/local/src/php-{{ php_version }}
+  notify:
+    - restart php-fpm
+- name: create php.d directory
+  become: yes
+  file:
+    path: /etc/php.d/
+    state: directory

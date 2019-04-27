@@ -1,0 +1,74 @@
+---
+# tasks file for php7
+- name: check for php
+  stat:
+    path: /usr/bin/php
+  register: php_check
+- import_tasks: compile_php.yml
+  when: not php_check.stat.exists
+- name: get php extension dir
+  command: php-config --extension-dir
+  register: php_extension_dir
+- name: copy php.ini
+  become: yes
+  template:
+    src: php-production.ini
+    dest: /etc/php.ini
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart php-fpm
+- name: copy php-fpm.conf
+  become: yes
+  template:
+    src: php-fpm.conf.default.ini
+    dest: /etc/php-fpm.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart php-fpm
+- name: copy opcache.ini
+  become: yes
+  template:
+    src: opcache.ini
+    dest: /etc/php.d/opcache.ini
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart php-fpm
+- name: copy php-fpm pool
+  become: yes
+  template:
+    src: www.conf.default.ini
+    dest: /etc/php-fpm.d/www.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart php-fpm
+- name: create php-fpm log file
+  become: yes
+  file:
+    path: /var/log/php-fpm.log
+    state: touch
+    owner: "{{ php_user }}"
+    group: "{{ php_group }}"
+    mode: 0644
+- name: create php-fpm service
+  become: yes
+  template:
+    src: php-fpm.service.ini
+    dest: /lib/systemd/system/php-fpm.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload systemd
+- name: set php-fpm auto start
+  become: yes
+  systemd:
+    name: php-fpm
+    enabled: "{{ php_fpm_autostart }}"

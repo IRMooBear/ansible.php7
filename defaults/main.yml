@@ -1,0 +1,159 @@
+---
+compile_threads: "{{ ansible_processor_cores }}"
+php_user: nginx
+php_group: nginx
+php_fpm_autostart: yes
+
+php_version: 7.3.2
+php_checksum: sha256:4597294b00edc1c63a021b6c7838eb43384f62eeb9e392f0b91c38a3c090f499
+
+# defaults file for php7
+#General PHP Options
+php_error_reporting: E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING & ~E_NOTICE
+php_display_error: Off
+php_display_startup_errors: Off
+php_memory_limit: 512M
+php_post_max_size: 32M
+php_max_input_time: 60
+php_max_execution_time: 60
+#Set this to 0 or php file get downloaded
+php_cgi_fix_pathinfo: 0
+php_upload_max_filesize: 8M
+php_auto_detect_line_endings: On
+php_date_timezone: "America/Los_Angeles"
+php_disable_functions: exec,passthru,shell_exec,system,error_reporting
+php_disable_classes:
+
+#PHP Opcache Options
+php_opcache_enable: 1
+php_opcache_memory_consumption: 128
+php_opcache_interned_strings_buffer: 8
+php_opcache_max_accelerated_files: 16229
+php_opcache_max_wasted_percentage: 5
+php_opcache_error_log: log/nginx/php-opcache-error.log
+
+#PHP FPM
+php_fpm_listen: "127.0.0.1:9000"
+php_fpm_user: nginx
+php_fpm_group: nginx
+php_fpm_daemon: php-fpm
+php_fpm_conf_path: "/etc/fpm"
+php_fpm_pool_conf_path: "/etc/php-fpm.d/www.conf"
+
+php_fpm_max_children: "{{ ansible_memory_mb.real.total / 96 }}"
+php_fpm_start_servers: 2
+php_fpm_min_spare_servers: 1
+php_fpm_max_spare_servers: 5
+php_fpm_max_requests: 100
+php_fpm_request_terminate_timeout: 300
+
+php_config:
+  Debian:
+    dependencies:
+      - libpcre3
+      - libpcre3-dev
+      - libxml2
+      - libxml2-dev
+      - libxslt1.1
+      - libxslt1-dev
+      - libgd3
+      - libgd-dev
+      - libgeoip-dev
+      - libmcrypt-dev
+      - bzip2
+      - libbz2-dev
+      - libzip-dev
+      - postgresql-server-dev-9.6
+      - libcurl4-gnutls-dev
+  RedHat:
+    dependencies:
+      - pcre
+      - pcre-devel
+      - gd
+      - gd-devel
+      - libmcrypt
+      - libmcrypt-devel
+      - libtool-ltdl-devel
+      - libxml2
+      - libxml2-devel
+      - openssl
+      - openssl-devel
+      - bzip2
+      - bzip2-devel
+      - libcurl
+      - libcurl-devel
+      - libxslt
+      - libxslt-devel
+      - postgresql-devel
+      - libmemcached
+      - libmemcached-devel
+      - libzip
+      - libzip-devel
+
+php_source_configure_command: >
+  --program-prefix=
+  --prefix=/usr
+  --exec-prefix=/usr
+  --bindir=/usr/bin
+  --sbindir=/usr/sbin
+  --sysconfdir=/etc
+  --datadir=/usr/share
+  --includedir=/usr/include
+  --libdir=/usr/lib64
+  --libexecdir=/usr/libexec
+  --localstatedir=/var
+  --sharedstatedir=/usr/com
+  --mandir=/usr/share/man
+  --infodir=/usr/share/info
+  --with-libdir=lib64
+  --with-config-file-path=/etc
+  --with-config-file-scan-dir=/etc/php.d
+  --disable-debug
+  --with-pic
+  --disable-rpath
+  --with-bz2
+  --with-curl
+  --with-freetype-dir=/usr
+  --with-png-dir=/usr
+  --enable-gd-native-ttf
+  --without-gdbm
+  --with-gettext
+  --with-iconv
+  --with-jpeg-dir=/usr
+  --with-openssl
+  --with-zlib
+  --with-layout=GNU
+  --enable-exif
+  --enable-ftp
+  --enable-sockets
+  --enable-sysvsem
+  --enable-sysvshm
+  --enable-sysvmsg
+  --enable-wddx --with-kerberos
+  --with-unixODBC=shared,/usr
+  --enable-shmop
+  --enable-calendar
+  --with-libxml-dir=/usr
+  --disable-dba
+  --without-unixODBC
+  --enable-pdo=shared
+  --with-pdo-sqlite=shared
+  --with-pdo-mysql=shared
+  --with-pdo-pgsql=shared
+  --with-gd
+  --enable-soap
+  --enable-bcmath
+  --enable-mbstring
+  --with-mcrypt=/usr
+  --enable-soap
+  --with-xsl
+  --enable-sockets
+  --enable-sigchild
+  --enable-dom
+  --enable-pdo
+  --with-pdo-mysql
+  --with-mysqli
+  --with-pgsql
+  --enable-opcache
+  --enable-fpm
+  --enable-zip

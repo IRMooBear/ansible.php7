@@ -1,0 +1,11 @@
+---
+# Handlers for PHP7
+- name: reload systemd
+  become: yes
+  systemd:
+    daemon_reload: yes
+- name: restart php-fpm
+  become: yes
+  service:
+    name: php-fpm
+    state: "{{ 'restarted' if php_fpm_autostart else 'stopped' }}"

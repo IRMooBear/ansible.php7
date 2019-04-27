@@ -1,0 +1,10 @@
+---
+- name: yum install php dependencies
+  become: yes
+  yum:
+    state: present
+    name: "{{ php_config[ansible_os_family].dependencies }}"
+  register: result
+  retries: 3
+  delay: 10
+  until: not result.failed
