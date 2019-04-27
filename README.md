@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/IRMooBear/ansible.php7.svg?branch=master)](https://travis-ci.org/IRMooBear/ansible.php7)
+
 PHP 7
 =========
 This Ansible role compile PHP 7 as defined by the variables.
