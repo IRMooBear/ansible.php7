@@ -2,10 +2,14 @@
 # tasks file for php7
 - name: check for php
   stat:
-    path: /usr/bin/php
+    path: /usr/local/src/php-{{ php_version }}
   register: php_check
+- name: check for php path
+  stat:
+    path: /usr/bin/php
+  register: php_path_check
 - import_tasks: compile_php.yml
-  when: not php_check.stat.exists
+  when: not php_check.stat.exists or not php_path_check.stat.exists
 - name: get php extension dir
   command: php-config --extension-dir
   register: php_extension_dir
